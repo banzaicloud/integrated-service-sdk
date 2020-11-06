@@ -36,6 +36,8 @@ spec:
         spec:
           description: ServiceInstanceSpec defines the desired state of ServiceInstance.
           properties:
+            config:
+              type: string
             enabled:
               type: boolean
             service:

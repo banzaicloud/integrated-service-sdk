@@ -23,6 +23,7 @@ type ServiceInstanceSpec struct {
 	Service string `json:"service,omitempty"`
 	Version string `json:"version,omitempty"`
 	Enabled *bool  `json:"enabled,omitempty"`
+	Config  string `json:"config,omitempty"`
 }
 
 type Phase string
