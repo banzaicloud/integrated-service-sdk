@@ -27,11 +27,11 @@ test: generate manifests ## Run unit tests
 
 # Install CRDs into a cluster
 install: manifests ## Install CRDs
-	kustomize build config/crd | kubectl apply -f -
+	kubectl apply -f config/crd/bases
 
 # Uninstall CRDs from a cluster
 uninstall: manifests ## Uninstall CRDs
-	kustomize build config/crd | kubectl delete -f -
+	kubectl delete -f config/crd/bases
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: bin/controller-gen ## Generate manifests
