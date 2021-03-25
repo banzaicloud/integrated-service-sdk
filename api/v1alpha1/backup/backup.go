@@ -28,49 +28,45 @@ type ServiceSpec struct {
 	ChartValues ValueOverrides `json:"chartValues"`
 }
 
-// +kubebuilder:object:generate=true
 type ValueOverrides struct {
-	Configuration   Configuration          `json:"Configuration"`
-	Credentials     Credentials            `json:"Credentials"`
-	Image           Image                  `json:"Image"`
-	RBAC            Rbac                   `json:"Rbac"`
-	InitContainers  []v1.Container         `json:"initContainers"`
-	CleanUpCRDs     bool                   `json:"cleanUpCRDs"`
-	ServiceAccount  ServiceAccount         `json:"ServiceAccount"`
-	SecurityContext SecurityContext        `json:"SecurityContext"`
-	Affinity        map[string]interface{} `json:"affinity"`
+	Configuration   Configuration   `json:"Configuration"`
+	Credentials     Credentials     `json:"Credentials"`
+	Image           Image           `json:"Image"`
+	RBAC            Rbac            `json:"Rbac"`
+	InitContainers  []v1.Container  `json:"initContainers"`
+	CleanUpCRDs     bool            `json:"cleanUpCRDs"`
+	ServiceAccount  ServiceAccount  `json:"ServiceAccount"`
+	SecurityContext SecurityContext `json:"SecurityContext"`
+	Affinity        v1.Affinity     `json:"affinity"`
 }
 
-// +kubebuilder:object:generate=true
 type SecurityContext struct {
 	FsGroup int `json:"fsGroup"`
 }
 
-// +kubebuilder:object:generate=true
 type ServiceAccount struct {
 	Server Server `json:"Server"`
 }
 
-// +kubebuilder:object:generate=true
+type Annotations map[string]string
+
 type Server struct {
-	Create      bool              `json:"create"`
-	Name        string            `json:"name"`
+	Create bool   `json:"create"`
+	Name   string `json:"name"`
+	// +optional
 	Annotations map[string]string `json:"annotations"`
 }
 
-// +kubebuilder:object:generate=true
 type Rbac struct {
 	Create bool `json:"create"`
 }
 
-// +kubebuilder:object:generate=true
 type Image struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 	PullPolicy string `json:"pullPolicy"`
 }
 
-// +kubebuilder:object:generate=true
 type Configuration struct {
 	Provider               string                 `json:"provider"`
 	VolumeSnapshotLocation VolumeSnapshotLocation `json:"VolumeSnapshotLocation"`
@@ -79,12 +75,10 @@ type Configuration struct {
 	LogLevel               string                 `json:"logLevel"`
 }
 
-// +kubebuilder:object:generate=true
 type Credentials struct {
 	ExistingSecret string `json:"existingSecret"`
 }
 
-// +kubebuilder:object:generate=true
 type VolumeSnapshotLocation struct {
 	Name     string                       `json:"name"`
 	Provider string                       `json:"provider"`
@@ -98,7 +92,6 @@ type VolumeSnapshotLocationConfig struct {
 	ResourceGroup string `json:"resourceGroup,omitempty"`
 }
 
-// +kubebuilder:object:generate=true
 type BackupStorageLocation struct {
 	Name     string                      `json:"name"`
 	Provider string                      `json:"provider"`
