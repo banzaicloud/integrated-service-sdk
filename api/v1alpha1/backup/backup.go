@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +kubebuilder:object:generate=true
+
 package backup
 
 import (
@@ -19,80 +21,102 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/mitchellh/mapstructure"
+	v1 "k8s.io/api/core/v1"
 )
-
-const (
-	// supported DNS provider names
-	dnsRoute53 = "route53"
-	dnsAzure   = "azure"
-	dnsGoogle  = "google"
-	dnsBanzai  = "banzaicloud-dns"
-)
-
-// +kubebuilder:object:generate=true
 
 type ServiceSpec struct {
-	Cluster       ClusterConfig `json:"cluster" mapstructure:"cluster"`
-	Bucket        BucketConfig `json:"bucket" mapstructure:"bucket"`
-	SecretName    string `json:"secretName"`
-
-	UseClusterSecret      bool `json:"UseClusterSecret"`
-	ServiceAccountRoleARN string `json:"secretName"`
-	UseProviderSecret     bool `json:"useProviderSecret"`
+	ChartValues ValueOverrides `json:"chartValues"`
 }
 
 // +kubebuilder:object:generate=true
-
-type ClusterConfig struct {
-	Name         string `json:"name"`
-	Provider     string `json:"provider"`
-	Distribution string `json:"distribution"`
-	Location     string `json:"location"`
-	RBACEnabled  bool `json:"rbacEnabled"`
-	ResourceGroup string `json:"resourceGroup"`
-}
-
-
-// +kubebuilder:object:generate=true
-
-type BucketConfig struct {
-	Name     string `json:"name"`
-	Prefix   string `json:"prefix"`
-	Provider string `json:"provider"`
-	Location string `json:"location"`
-	StorageAccount string `json:"storageAccount"`
-	ResourceGroup  string `json:"resourceGroup"`
-}
-
-
-func (s ServiceSpec) Validate() error {
-    var secretNameErr error
-	if s.SecretName == "" {
-		secretNameErr = requiredStringFieldError{fieldName: "secretName"}
-	}
-	return errors.Combine(s.Cluster.Validate(), s.Bucket.Validate(), secretNameErr)
-}
-
-
-func (s ClusterConfig) Validate() error {
-	// TODO check all required fields.
-	// resourceGroup required only for Azure
-	if s.Name == "" {
-		return requiredStringFieldError{fieldName: "cluster.name"}
-	}
-	return nil
-}
-
-func (s BucketConfig) Validate() error {
-	// TODO check all required fields.
-	// storageAccount, resourceGroup required only for Azure
-	if s.Name == "" {
-		return requiredStringFieldError{fieldName: "bucket.name"}
-	}
-	return nil
+type ValueOverrides struct {
+	Configuration   Configuration          `json:"Configuration"`
+	Credentials     Credentials            `json:"Credentials"`
+	Image           Image                  `json:"Image"`
+	RBAC            Rbac                   `json:"Rbac"`
+	InitContainers  []v1.Container         `json:"initContainers"`
+	CleanUpCRDs     bool                   `json:"cleanUpCRDs"`
+	ServiceAccount  ServiceAccount         `json:"ServiceAccount"`
+	SecurityContext SecurityContext        `json:"SecurityContext"`
+	Affinity        map[string]interface{} `json:"affinity"`
 }
 
 // +kubebuilder:object:generate=true
+type SecurityContext struct {
+	FsGroup int `json:"fsGroup"`
+}
+
+// +kubebuilder:object:generate=true
+type ServiceAccount struct {
+	Server Server `json:"Server"`
+}
+
+// +kubebuilder:object:generate=true
+type Server struct {
+	Create      bool              `json:"create"`
+	Name        string            `json:"name"`
+	Annotations map[string]string `json:"annotations"`
+}
+
+// +kubebuilder:object:generate=true
+type Rbac struct {
+	Create bool `json:"create"`
+}
+
+// +kubebuilder:object:generate=true
+type Image struct {
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+	PullPolicy string `json:"pullPolicy"`
+}
+
+// +kubebuilder:object:generate=true
+type Configuration struct {
+	Provider               string                 `json:"provider"`
+	VolumeSnapshotLocation VolumeSnapshotLocation `json:"VolumeSnapshotLocation"`
+	BackupStorageLocation  BackupStorageLocation  `json:"BackupStorageLocation"`
+	RestoreOnlyMode        bool                   `json:"restoreOnlyMode"`
+	LogLevel               string                 `json:"logLevel"`
+}
+
+// +kubebuilder:object:generate=true
+type Credentials struct {
+	ExistingSecret string `json:"existingSecret"`
+}
+
+// +kubebuilder:object:generate=true
+type VolumeSnapshotLocation struct {
+	Name     string                       `json:"name"`
+	Provider string                       `json:"provider"`
+	Config   VolumeSnapshotLocationConfig `json:"config,omitempty"`
+}
+
+type VolumeSnapshotLocationConfig struct {
+	Region        string `json:"region,omitempty"`
+	Profile       string `json:"profile,omitempty"`
+	ApiTimeout    string `json:"apiTimeout,omitempty"`
+	ResourceGroup string `json:"resourceGroup,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type BackupStorageLocation struct {
+	Name     string                      `json:"name"`
+	Provider string                      `json:"provider"`
+	Bucket   string                      `json:"bucket"`
+	Prefix   string                      `json:"prefix"`
+	Config   BackupStorageLocationConfig `json:"config,omitempty"`
+}
+
+type BackupStorageLocationConfig struct {
+	Region                  string `json:"region,omitempty"`
+	Profile                 string `json:"profile,omitempty"`
+	S3ForcePathStyle        string `json:"s3ForcePathStyle,omitempty"`
+	S3Url                   string `json:"s3Url,omitempty"`
+	KMSKeyId                string `json:"kmsKeyId,omitempty"`
+	ResourceGroup           string `json:"resourceGroup,omitempty"`
+	StorageAccount          string `json:"storageAccount,omitempty"`
+	StorageAccountKeyEnvVar string `json:"storageAccountKeyEnvVar,omitempty"`
+}
 
 func BindIntegratedServiceSpec(spec map[string]interface{}) (ServiceSpec, error) {
 	var boundSpec ServiceSpec
