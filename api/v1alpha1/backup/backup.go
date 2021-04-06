@@ -29,14 +29,14 @@ type ServiceSpec struct {
 }
 
 type ValueOverrides struct {
-	Configuration   Configuration   `json:"Configuration"`
-	Credentials     Credentials     `json:"Credentials"`
-	Image           Image           `json:"Image"`
-	RBAC            Rbac            `json:"Rbac"`
+	Configuration   Configuration   `json:"configuration"`
+	Credentials     Credentials     `json:"credentials"`
+	Image           Image           `json:"image"`
+	RBAC            Rbac            `json:"rbac"`
 	InitContainers  []v1.Container  `json:"initContainers"`
 	CleanUpCRDs     bool            `json:"cleanUpCRDs"`
-	ServiceAccount  ServiceAccount  `json:"ServiceAccount"`
-	SecurityContext SecurityContext `json:"SecurityContext"`
+	ServiceAccount  ServiceAccount  `json:"serviceAccount"`
+	SecurityContext SecurityContext `json:"securityContext"`
 	Affinity        v1.Affinity     `json:"affinity"`
 }
 
@@ -45,7 +45,7 @@ type SecurityContext struct {
 }
 
 type ServiceAccount struct {
-	Server Server `json:"Server"`
+	Server Server `json:"server"`
 }
 
 type Annotations map[string]string
@@ -69,8 +69,8 @@ type Image struct {
 
 type Configuration struct {
 	Provider               string                 `json:"provider"`
-	VolumeSnapshotLocation VolumeSnapshotLocation `json:"VolumeSnapshotLocation"`
-	BackupStorageLocation  BackupStorageLocation  `json:"BackupStorageLocation"`
+	VolumeSnapshotLocation VolumeSnapshotLocation `json:"volumeSnapshotLocation"`
+	BackupStorageLocation  BackupStorageLocation  `json:"backupStorageLocation"`
 	RestoreOnlyMode        bool                   `json:"restoreOnlyMode"`
 	LogLevel               string                 `json:"logLevel"`
 }
@@ -113,6 +113,7 @@ type BackupStorageLocationConfig struct {
 
 func BindIntegratedServiceSpec(spec map[string]interface{}) (ServiceSpec, error) {
 	var boundSpec ServiceSpec
+
 	if err := mapstructure.Decode(spec, &boundSpec); err != nil {
 		return boundSpec, errors.WrapIf(err, "failed to bind integrated service spec")
 	}

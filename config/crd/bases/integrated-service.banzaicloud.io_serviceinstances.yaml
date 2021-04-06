@@ -41,130 +41,6 @@ spec:
                     properties:
                       chartValues:
                         properties:
-                          Configuration:
-                            properties:
-                              BackupStorageLocation:
-                                properties:
-                                  bucket:
-                                    type: string
-                                  config:
-                                    properties:
-                                      kmsKeyId:
-                                        type: string
-                                      profile:
-                                        type: string
-                                      region:
-                                        type: string
-                                      resourceGroup:
-                                        type: string
-                                      s3ForcePathStyle:
-                                        type: string
-                                      s3Url:
-                                        type: string
-                                      storageAccount:
-                                        type: string
-                                      storageAccountKeyEnvVar:
-                                        type: string
-                                    type: object
-                                  name:
-                                    type: string
-                                  prefix:
-                                    type: string
-                                  provider:
-                                    type: string
-                                required:
-                                - bucket
-                                - name
-                                - prefix
-                                - provider
-                                type: object
-                              VolumeSnapshotLocation:
-                                properties:
-                                  config:
-                                    properties:
-                                      apiTimeout:
-                                        type: string
-                                      profile:
-                                        type: string
-                                      region:
-                                        type: string
-                                      resourceGroup:
-                                        type: string
-                                    type: object
-                                  name:
-                                    type: string
-                                  provider:
-                                    type: string
-                                required:
-                                - name
-                                - provider
-                                type: object
-                              logLevel:
-                                type: string
-                              provider:
-                                type: string
-                              restoreOnlyMode:
-                                type: boolean
-                            required:
-                            - BackupStorageLocation
-                            - VolumeSnapshotLocation
-                            - logLevel
-                            - provider
-                            - restoreOnlyMode
-                            type: object
-                          Credentials:
-                            properties:
-                              existingSecret:
-                                type: string
-                            required:
-                            - existingSecret
-                            type: object
-                          Image:
-                            properties:
-                              pullPolicy:
-                                type: string
-                              repository:
-                                type: string
-                              tag:
-                                type: string
-                            required:
-                            - pullPolicy
-                            - repository
-                            - tag
-                            type: object
-                          Rbac:
-                            properties:
-                              create:
-                                type: boolean
-                            required:
-                            - create
-                            type: object
-                          SecurityContext:
-                            properties:
-                              fsGroup:
-                                type: integer
-                            required:
-                            - fsGroup
-                            type: object
-                          ServiceAccount:
-                            properties:
-                              Server:
-                                properties:
-                                  annotations:
-                                    additionalProperties:
-                                      type: string
-                                    type: object
-                                  create:
-                                    type: boolean
-                                  name:
-                                    type: string
-                                required:
-                                - create
-                                - name
-                                type: object
-                            required:
-                            - Server
-                            type: object
                           affinity:
                             description: Affinity is a group of affinity scheduling rules.
                             properties:
@@ -508,6 +384,97 @@ spec:
                             type: object
                           cleanUpCRDs:
                             type: boolean
+                          configuration:
+                            properties:
+                              backupStorageLocation:
+                                properties:
+                                  bucket:
+                                    type: string
+                                  config:
+                                    properties:
+                                      kmsKeyId:
+                                        type: string
+                                      profile:
+                                        type: string
+                                      region:
+                                        type: string
+                                      resourceGroup:
+                                        type: string
+                                      s3ForcePathStyle:
+                                        type: string
+                                      s3Url:
+                                        type: string
+                                      storageAccount:
+                                        type: string
+                                      storageAccountKeyEnvVar:
+                                        type: string
+                                    type: object
+                                  name:
+                                    type: string
+                                  prefix:
+                                    type: string
+                                  provider:
+                                    type: string
+                                required:
+                                - bucket
+                                - name
+                                - prefix
+                                - provider
+                                type: object
+                              logLevel:
+                                type: string
+                              provider:
+                                type: string
+                              restoreOnlyMode:
+                                type: boolean
+                              volumeSnapshotLocation:
+                                properties:
+                                  config:
+                                    properties:
+                                      apiTimeout:
+                                        type: string
+                                      profile:
+                                        type: string
+                                      region:
+                                        type: string
+                                      resourceGroup:
+                                        type: string
+                                    type: object
+                                  name:
+                                    type: string
+                                  provider:
+                                    type: string
+                                required:
+                                - name
+                                - provider
+                                type: object
+                            required:
+                            - backupStorageLocation
+                            - logLevel
+                            - provider
+                            - restoreOnlyMode
+                            - volumeSnapshotLocation
+                            type: object
+                          credentials:
+                            properties:
+                              existingSecret:
+                                type: string
+                            required:
+                            - existingSecret
+                            type: object
+                          image:
+                            properties:
+                              pullPolicy:
+                                type: string
+                              repository:
+                                type: string
+                              tag:
+                                type: string
+                            required:
+                            - pullPolicy
+                            - repository
+                            - tag
+                            type: object
                           initContainers:
                             items:
                               description: A single application container that you want to run within a pod.
@@ -1221,16 +1188,49 @@ spec:
                               - name
                               type: object
                             type: array
+                          rbac:
+                            properties:
+                              create:
+                                type: boolean
+                            required:
+                            - create
+                            type: object
+                          securityContext:
+                            properties:
+                              fsGroup:
+                                type: integer
+                            required:
+                            - fsGroup
+                            type: object
+                          serviceAccount:
+                            properties:
+                              server:
+                                properties:
+                                  annotations:
+                                    additionalProperties:
+                                      type: string
+                                    type: object
+                                  create:
+                                    type: boolean
+                                  name:
+                                    type: string
+                                required:
+                                - create
+                                - name
+                                type: object
+                            required:
+                            - server
+                            type: object
                         required:
-                        - Configuration
-                        - Credentials
-                        - Image
-                        - Rbac
-                        - SecurityContext
-                        - ServiceAccount
                         - affinity
                         - cleanUpCRDs
+                        - configuration
+                        - credentials
+                        - image
                         - initContainers
+                        - rbac
+                        - securityContext
+                        - serviceAccount
                         type: object
                     required:
                     - chartValues
