@@ -51,10 +51,10 @@ type ServiceAccount struct {
 type Annotations map[string]string
 
 type Server struct {
-	Create bool   `json:"create"`
-	Name   string `json:"name"`
+	Create bool    `json:"create"`
+	Name   string `json:"name,omitempty"`
 	// +optional
-	Annotations map[string]string `json:"annotations"`
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
 type Rbac struct {

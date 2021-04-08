@@ -1216,7 +1216,6 @@ spec:
                                     type: string
                                 required:
                                 - create
-                                - name
                                 type: object
                             required:
                             - server
