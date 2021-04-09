@@ -120,6 +120,44 @@ func BindIntegratedServiceSpec(spec map[string]interface{}) (ServiceSpec, error)
 	return boundSpec, nil
 }
 
+func (s ServiceSpec) Validate() error {
+	var errs error
+
+	if s.ChartValues.Credentials.ExistingSecret == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.credentials.existingSecret"})
+	}
+
+	if s.ChartValues.Configuration.Provider == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.provider"})
+	}
+
+	if s.ChartValues.Configuration.BackupStorageLocation.Provider == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.backupStorageLocation.provider"})
+	}
+
+	if s.ChartValues.Configuration.BackupStorageLocation.Name == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.backupStorageLocation.name"})
+	}
+
+	if s.ChartValues.Configuration.BackupStorageLocation.Bucket == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.backupStorageLocation.bucket"})
+	}
+
+	if s.ChartValues.Configuration.BackupStorageLocation.Prefix == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.backupStorageLocation.prefix"})
+	}
+
+	if s.ChartValues.Configuration.VolumeSnapshotLocation.Name == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.volumeSnapshotLocation.name"})
+	}
+
+	if s.ChartValues.Configuration.VolumeSnapshotLocation.Provider == "" {
+		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.volumeSnapshotLocation.provider"})
+	}
+
+	return errors.Combine(errs)
+}
+
 type requiredStringFieldError struct {
 	fieldName string
 }
@@ -127,3 +165,5 @@ type requiredStringFieldError struct {
 func (e requiredStringFieldError) Error() string {
 	return fmt.Sprintf("%s must be specified and cannot be empty", e.fieldName)
 }
+
+

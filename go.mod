@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	emperror.dev/errors v0.8.0
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.4.1
 	github.com/stretchr/testify v1.4.0
 	k8s.io/api v0.18.6
 	k8s.io/apimachinery v0.19.2
