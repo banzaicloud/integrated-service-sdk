@@ -42,8 +42,6 @@ type ValueOverrides struct {
 	ServiceAccount  ServiceAccount  `json:"serviceAccount,omitempty"`
 	SecurityContext SecurityContext `json:"securityContext,omitempty"`
 	Affinity        v1.Affinity     `json:"affinity,omitempty"`
-	Image           Image           `json:"image,omitempty"`
-	InitContainers  []v1.Container  `json:"initContainers,omitempty"`
 }
 
 type SecurityContext struct {
