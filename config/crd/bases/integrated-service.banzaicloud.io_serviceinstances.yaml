@@ -1221,15 +1221,10 @@ spec:
                             - server
                             type: object
                         required:
-                        - affinity
                         - cleanUpCRDs
                         - configuration
                         - credentials
-                        - image
-                        - initContainers
                         - rbac
-                        - securityContext
-                        - serviceAccount
                         type: object
                     required:
                     - chartValues

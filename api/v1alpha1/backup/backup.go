@@ -24,6 +24,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+type Provider string
+
+const AWSProvider Provider = "aws"
+const AzureProvider Provider = "azure"
+const GCPProvider Provider = "gcp"
+
 type ServiceSpec struct {
 	ChartValues ValueOverrides `json:"chartValues"`
 }
@@ -31,13 +37,13 @@ type ServiceSpec struct {
 type ValueOverrides struct {
 	Configuration   Configuration   `json:"configuration"`
 	Credentials     Credentials     `json:"credentials"`
-	Image           Image           `json:"image"`
 	RBAC            Rbac            `json:"rbac"`
-	InitContainers  []v1.Container  `json:"initContainers"`
 	CleanUpCRDs     bool            `json:"cleanUpCRDs"`
-	ServiceAccount  ServiceAccount  `json:"serviceAccount"`
-	SecurityContext SecurityContext `json:"securityContext"`
-	Affinity        v1.Affinity     `json:"affinity"`
+	ServiceAccount  ServiceAccount  `json:"serviceAccount,omitempty"`
+	SecurityContext SecurityContext `json:"securityContext,omitempty"`
+	Affinity        v1.Affinity     `json:"affinity,omitempty"`
+	Image           Image           `json:"image,omitempty"`
+	InitContainers  []v1.Container  `json:"initContainers,omitempty"`
 }
 
 type SecurityContext struct {
@@ -51,7 +57,7 @@ type ServiceAccount struct {
 type Annotations map[string]string
 
 type Server struct {
-	Create bool    `json:"create"`
+	Create bool   `json:"create"`
 	Name   string `json:"name,omitempty"`
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
@@ -68,7 +74,7 @@ type Image struct {
 }
 
 type Configuration struct {
-	Provider               string                 `json:"provider"`
+	Provider               Provider               `json:"provider"`
 	VolumeSnapshotLocation VolumeSnapshotLocation `json:"volumeSnapshotLocation"`
 	BackupStorageLocation  BackupStorageLocation  `json:"backupStorageLocation"`
 	RestoreOnlyMode        bool                   `json:"restoreOnlyMode"`
@@ -81,7 +87,7 @@ type Credentials struct {
 
 type VolumeSnapshotLocation struct {
 	Name     string                       `json:"name"`
-	Provider string                       `json:"provider"`
+	Provider Provider                     `json:"provider"`
 	Config   VolumeSnapshotLocationConfig `json:"config,omitempty"`
 }
 
@@ -94,7 +100,7 @@ type VolumeSnapshotLocationConfig struct {
 
 type BackupStorageLocation struct {
 	Name     string                      `json:"name"`
-	Provider string                      `json:"provider"`
+	Provider Provider                    `json:"provider"`
 	Bucket   string                      `json:"bucket"`
 	Prefix   string                      `json:"prefix"`
 	Config   BackupStorageLocationConfig `json:"config,omitempty"`
@@ -131,8 +137,16 @@ func (s ServiceSpec) Validate() error {
 		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.provider"})
 	}
 
+	if err := validateProvider(s.ChartValues.Configuration.Provider); err != nil {
+		errs = errors.Append(errs, err)
+	}
+
 	if s.ChartValues.Configuration.BackupStorageLocation.Provider == "" {
 		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.backupStorageLocation.provider"})
+	}
+
+	if err := validateProvider(s.ChartValues.Configuration.BackupStorageLocation.Provider); err != nil {
+		errs = errors.Append(errs, err)
 	}
 
 	if s.ChartValues.Configuration.BackupStorageLocation.Name == "" {
@@ -155,6 +169,10 @@ func (s ServiceSpec) Validate() error {
 		errs = errors.Append(errs, requiredStringFieldError{fieldName: "chartValues.configuration.volumeSnapshotLocation.provider"})
 	}
 
+	if err := validateProvider(s.ChartValues.Configuration.VolumeSnapshotLocation.Provider); err != nil {
+		errs = errors.Append(errs, err)
+	}
+
 	return errors.Combine(errs)
 }
 
@@ -166,4 +184,21 @@ func (e requiredStringFieldError) Error() string {
 	return fmt.Sprintf("%s must be specified and cannot be empty", e.fieldName)
 }
 
+type invalidProviderFieldError struct {
+	fieldName string
+}
 
+func (e invalidProviderFieldError) Error() string {
+	return fmt.Sprintf("%s is not a valid provider", e.fieldName)
+}
+
+func validateProvider(provider Provider) error {
+	switch provider {
+	case AWSProvider:
+	case GCPProvider:
+	case AzureProvider:
+	default:
+		return invalidProviderFieldError{fieldName: "chartValues.configuration.volumeSnapshotLocation.provider"}
+	}
+	return nil
+}
