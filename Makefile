@@ -10,7 +10,7 @@ endif
 
 OS = $(shell uname | tr A-Z a-z)
 
-CONTROLLER_GEN_VERSION = v0.2.5
+CONTROLLER_GEN_VERSION = v0.5.0
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
 
 GOLANGCI_VERSION = 1.30.0
